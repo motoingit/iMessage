@@ -1,4 +1,4 @@
-import User from "./models/user.model.js";
+import User from "../models/user.model.js";
 import { hasImageKitConfig, uploadChatMedia } from "../lib/imagekit.js";
 
 export async function getUserForSidebar(req, res) {
