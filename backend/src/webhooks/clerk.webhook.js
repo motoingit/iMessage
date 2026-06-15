@@ -1,16 +1,14 @@
 import express from "express";
 import { verifyWebhook } from "@clerk/express/webhooks";
 
-import User from "../models/user.model.js";
+import User from "../models/message.model.js";
 
 const router = express.Router();
 
 router.post("/", async (req, res) => {
   console.log("🔥 [1] Clerk webhook received");
 
-  const signingSecret =
-    process.env.CLERK_WEBHOOK_SIGNING_SECRET ??
-    process.env.CLERK_WEBHOOK_SIGNIN_KEY;
+  const signingSecret = process.env.CLERK_WEBHOOK_SIGNIN_KEY;
 
   console.log("🔥 [2] Secret exists:", !!signingSecret);
 

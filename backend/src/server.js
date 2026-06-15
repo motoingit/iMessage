@@ -9,6 +9,7 @@ import path from "path"
 
 import {clerkMiddleware} from '@clerk/express'
 import clerkWebhook from './webhooks/clerk.webhook.js';
+import authRoutes from './routes/auth.route.js';
 import User from "./models/user.model.js";
 
                           //* BEGINS
@@ -42,6 +43,8 @@ app.get("/health", (req, res) => {
     ok:true,
   });
 })
+
+app.use("api/auth", authRoutes);
 
 // app.get("/", (req, res) => {
 //   res.send("Backend is Running");
