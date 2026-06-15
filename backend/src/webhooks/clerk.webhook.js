@@ -6,6 +6,8 @@ import User from "../models/user.model.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
+  console.log("🔥 Clerk webhook received");
+
   const signingSecret =
     process.env.CLERK_WEBHOOK_SIGNING_SECRET ?? process.env.CLERK_WEBHOOK_SIGNIN_KEY;
 
@@ -49,6 +51,8 @@ router.post("/", async (req, res) => {
     }
 
     res.status(200).json({ received: true });
+
+    console.log("🔥 Clerk webhook Sucessfull Sended to MONGO");
   } catch (error) {
     console.error("Error in Clerk webhook:", error);
     res.status(400).json({ message: "Webhook verification failed" });
