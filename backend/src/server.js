@@ -10,7 +10,7 @@ import path from "path"
 import {clerkMiddleware} from '@clerk/express'
 import clerkWebhook from './webhooks/clerk.webhook.js';
 import authRoutes from './routes/auth.route.js';
-import authRoutes from './routes/message.route.js';
+import messageRoutes from './routes/message.route.js';
 import User from "./models/user.model.js";
 
                           //* BEGINS
@@ -45,8 +45,8 @@ app.get("/health", (req, res) => {
   });
 })
 
-app.use("api/auth", authRoutes);
-app.use("api/messages", messageRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
 
 // app.get("/", (req, res) => {
 //   res.send("Backend is Running");
