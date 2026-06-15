@@ -12,7 +12,7 @@ router.get("/users" ,getUserForSidebar)
 router.get("/conversations" ,getConversationsForSidebar)
 router.get("/:id" ,getMessages)
 
-router.post("/send/:id", upload.single("media"), upload,sendMessages)
+router.post("/send/:id", upload.single("media"), sendMessages)
 //todo: show this in the frotend
 
 export default router;
