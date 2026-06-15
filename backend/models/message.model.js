@@ -1,0 +1,31 @@
+import mongoose, { Schema } from "mongoose";
+
+const messageSchema = new mongoose.Schema({
+  SenderId:{
+    //why this message is not like String id
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+
+  receiverId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+
+  text:{
+    type: String,
+  },
+  image:{
+    type: String,
+  },
+  video:{
+    type: String,
+  }
+
+},{timestamps: true});
+
+const Message = mongoose.model("User", messageSchema);
+
+export default Message;
