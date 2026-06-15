@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Message from "../models/message.model.js";
 import { hasImageKitConfig, uploadChatMedia } from "../lib/imagekit.js";
 
 export async function getUserForSidebar(req, res) {
@@ -17,7 +18,7 @@ export async function getUserForSidebar(req, res) {
 export async function getConversationsForSidebar(req, res) {
   try{
     const loggedInUserId = req.user._id;
-    await Message.aggregate([
+    const conversations = await Message.aggregate([
       //* 1. Keep only the messages I sent or received.
       { $match: { $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }] } },
 
@@ -42,6 +43,8 @@ export async function getConversationsForSidebar(req, res) {
       //* 6. Hide the private clerkId field from the result.
       { $project: { clerkId: 0 } },
     ]);
+
+    res.status(200).json(conversations);
   }catch(error){
     console.error("Error in getConversationsForSidebar:", error.message);
     res.status(500).json({ message: "Internal server error" });
@@ -84,7 +87,7 @@ export async function sendMessages(req, res) {
       }
 
       const url = await uploadChatMedia(req.file);
-      if(req.file.mimetype.startWith("video/")) videoUrl = url;
+      if(req.file.mimetype.startsWith("video/")) videoUrl = url;
       else imageUrl = url;
 
     }

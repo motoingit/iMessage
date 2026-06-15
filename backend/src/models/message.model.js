@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 const messageSchema = new mongoose.Schema({
-  SenderId:{
-    //why this message is not like String id
+  //  _id is defualt
+
+  senderId:{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
