@@ -1,14 +1,14 @@
 import express from "express";
 import "dotenv/config";
 
-import { connectDatabase } from "../lib/db.js";
+import { connectDatabase } from "./lib/db.js";
 
 import cors from "cors";
 import fs from "fs"
 import path from "path"
 
 import {clerkMiddleware} from '@clerk/express'
-import User from "../models/user.model.js";
+import User from "./models/user.model.js";
 
                           //* BEGINS
 //? ENV Extraction
