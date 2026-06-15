@@ -6,34 +6,59 @@ import User from "../models/user.model.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  console.log("🔥 Clerk webhook received");
+  console.log("🔥 [1] Clerk webhook received");
 
   const signingSecret =
-    process.env.CLERK_WEBHOOK_SIGNING_SECRET ?? process.env.CLERK_WEBHOOK_SIGNIN_KEY;
+    process.env.CLERK_WEBHOOK_SIGNING_SECRET ??
+    process.env.CLERK_WEBHOOK_SIGNIN_KEY;
+
+  console.log("🔥 [2] Secret exists:", !!signingSecret);
 
   if (!signingSecret) {
-    res.status(503).json({ message: "Webhook secret is not provided" });
-    return;
+    console.log("❌ [3] Missing webhook secret");
+    return res.status(503).json({
+      message: "Webhook secret is not provided",
+    });
   }
 
   try {
+    console.log("🔥 [4] Starting webhook verification");
+
     const evt = await verifyWebhook(req, { signingSecret });
 
+    console.log("🔥 [5] Webhook verified");
+    console.log("🔥 [6] Event type:", evt.type);
+
     if (evt.type === "user.created" || evt.type === "user.updated") {
+      console.log("🔥 [7] Processing user create/update");
+
       const clerkUser = evt.data;
 
+      console.log("🔥 [8] Clerk user id:", clerkUser.id);
+
       const email =
-        clerkUser.email_addresses?.find((entry) => entry.id === clerkUser.primary_email_address_id)
-          ?.email_address ?? clerkUser.email_addresses?.[0]?.email_address;
+        clerkUser.email_addresses?.find(
+          (entry) => entry.id === clerkUser.primary_email_address_id
+        )?.email_address ??
+        clerkUser.email_addresses?.[0]?.email_address;
 
       const fullName =
-        [clerkUser.first_name, clerkUser.last_name].filter(Boolean).join(" ") ||
+        [clerkUser.first_name, clerkUser.last_name]
+          .filter(Boolean)
+          .join(" ") ||
         clerkUser.username ||
         email?.split("@")[0] ||
         "";
 
+      console.log("🔥 [9] Extracted data:", {
+        email,
+        fullName,
+      });
+
       if (email && fullName) {
-        await User.findOneAndUpdate(
+        console.log("🔥 [10] About to save to MongoDB");
+
+        const result = await User.findOneAndUpdate(
           { clerkId: clerkUser.id },
           {
             clerkId: clerkUser.id,
@@ -41,26 +66,53 @@ router.post("/", async (req, res) => {
             fullName,
             profilePic: clerkUser.image_url ?? "",
           },
-          { new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true },
+          {
+            new: true,
+            upsert: true,
+            setDefaultsOnInsert: true,
+            runValidators: true,
+          }
         );
+
+        console.log("🔥 [11] MongoDB operation completed");
+        console.log("🔥 [12] Saved user:", result?._id);
+      } else {
+        console.log("⚠️ [10A] Missing email or fullName");
       }
     }
 
-    if (evt.type === "user.deleted" && evt.data.id) {
-      await User.findOneAndDelete({ clerkId: evt.data.id });
+    if (evt.type === "user.deleted") {
+      console.log("🔥 [13] Processing user delete");
+
+      if (evt.data.id) {
+        console.log("🔥 [14] Deleting user:", evt.data.id);
+
+        await User.findOneAndDelete({
+          clerkId: evt.data.id,
+        });
+
+        console.log("🔥 [15] User deleted");
+      }
     }
 
-    res.status(200).json({ received: true });
+    console.log("🔥 [16] Sending success response");
 
-    console.log("🔥 Clerk webhook Sucessfull Sended to MONGO");
+    res.status(200).json({
+      received: true,
+    });
+
+    console.log("🔥 [17] Response sent");
+    console.log("🔥 Clerk webhook Successfully Sent to Mongo");
   } catch (error) {
-    console.error("Error in Clerk webhook:", error);
-    res.status(400).json({ message: "Webhook verification failed" });
+    console.error("❌ WEBHOOK ERROR START");
+    console.error(error);
+    console.error("❌ WEBHOOK ERROR END");
+
+    res.status(400).json({
+      message: "Webhook verification failed",
+      error: error?.message,
+    });
   }
-
-})
-
+});
 
 export default router;
-
-
