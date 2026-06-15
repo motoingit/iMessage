@@ -39,9 +39,9 @@ app.get("/health", (req, res) => {
   });
 })
 
-app.get("/", (req, res) => {
-  res.send("Backend is Running");
-})
+// app.get("/", (req, res) => {
+//   res.send("Backend is Running");
+// })
 
 // func
 if(fs.existsSync(publicDir)){
@@ -58,7 +58,7 @@ async function startServer() {
 
   await connectDatabase();
 
-  const server = app.listen(PORT, "0.0.0.0", ()=>{
+  const server = await app.listen(PORT, "0.0.0.0", ()=>{
     console.log(`server is running on http://localhost:${PORT}`);
   })
 
