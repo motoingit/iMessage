@@ -8,6 +8,7 @@ import fs from "fs"
 import path from "path"
 
 import {clerkMiddleware} from '@clerk/express'
+import clerkWebhook from './webhooks/clerk.webhook.js';
 import User from "./models/user.model.js";
 
                           //* BEGINS
@@ -21,6 +22,9 @@ const app = express();
 
 // use
 
+//*its impo that you dont parse the webhook event data
+app.use("/api/webhooks/clerk", express.raw({ type: "application/json" }), clerkWebhook)
+
 app.use(express.json()) //* app.use for middleware
 
 app.use(
@@ -30,7 +34,7 @@ app.use(
   })
 );
 
-// app.use(clerkMiddleware())
+app.use(clerkMiddleware())
 
 //get
 app.get("/health", (req, res) => {
