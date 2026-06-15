@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    // _id auto genrated
     clerkId:{
       type:String,
       required: true,
