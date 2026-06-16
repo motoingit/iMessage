@@ -1,23 +1,15 @@
 import { Avatar, Button } from "@heroui/react";
-import { ChevronLeftIcon, Volume2Icon, VolumeXIcon, XIcon } from "lucide-react";
+import { ChevronLeftIcon, XIcon } from "lucide-react";
 import { AppLogo } from "../AppLogo";
 import { AvatarWithOnlineIndicator } from "./AvatarWithOnlineIndicator";
 
-import { ThemePresetPicker } from "../ThemePresetPicker";
-
-import { ThemeToggle } from "../ThemeToggle";
-import { WallpaperPicker } from "../WallpaperPicker";
-import { SoundSettingsPicker } from "../SoundSettingsPicker";
+import { SettingsModal } from "../SettingsModal";
 
 import { useChatStore } from "../../store/useChatStore";
 import { useSelectedConversation } from "../../hooks/useSelectedConversation";
-import toast from "react-hot-toast";
 
 export function ChatHeader() {
-  const isSoundEnabled = useChatStore((state) => state.isSoundEnabled);
   const setActiveConversationId = useChatStore((state) => state.setActiveConversationId);
-  const setSoundEnabled = useChatStore((state) => state.setSoundEnabled);
-
   const { activeConversation, isLargeScreen } = useSelectedConversation();
 
   return (
@@ -71,32 +63,7 @@ export function ChatHeader() {
       )}
 
       <div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-0.5 sm:gap-1">
-        <div className="hidden min-[400px]:contents">
-          <WallpaperPicker />
-          <ThemePresetPicker />
-          <SoundSettingsPicker />
-        </div>
-
-        <ThemeToggle />
-
-        <Button
-          variant="ghost"
-          size="sm"
-          isIconOnly
-          className="shrink-0"
-          aria-pressed={isSoundEnabled}
-          onPress={() => {
-            const nextSoundState = !isSoundEnabled;
-            setSoundEnabled(nextSoundState);
-            toast.success(nextSoundState ? "Keystroke sounds enabled" : "Keystroke sounds muted");
-          }}
-        >
-          {isSoundEnabled ? (
-            <Volume2Icon className="size-5.5" strokeWidth={2} aria-hidden />
-          ) : (
-            <VolumeXIcon className="size-5.5" strokeWidth={2} aria-hidden />
-          )}
-        </Button>
+        <SettingsModal />
 
         {activeConversation ? (
           <Button

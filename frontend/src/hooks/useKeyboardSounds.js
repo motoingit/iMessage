@@ -10,6 +10,8 @@ function useKeyboardSounds() {
 
     // Resolve active selection: database settings -> fallback to the first sound in the list
     const selectedId = authUser?.selectedKeystrokeSoundId;
+    if (selectedId === "none") return;
+
     const soundObj = keystrokeSounds.find((s) => s.id === selectedId) || keystrokeSounds[0];
 
     if (!soundObj || !soundObj.url) return;

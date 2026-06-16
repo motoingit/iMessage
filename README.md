@@ -6,11 +6,10 @@ A premium, feature-rich real-time messaging clone of iMessage built using the **
 
 ## 🚀 Key Features
 
-* **Real-time Messaging**: Powered by **Socket.io** for low-latency chat delivery and live presence indicators (online/offline status).
+* **Real-time Messaging**: Powered by **Socket.io** using direct WebSocket transports (bypassing HTTP polling handshakes for <100ms message speed) with multi-connection/tab tracking to ensure seamless presence syncing.
 * **Clerk Authentication**: Secure session management with Clerk, utilizing webhooks to automatically sync user profile creation, updates, and deletion into the MongoDB database.
+* **Consolidated Settings Modal**: A unified settings panel (gear icon) with sub-tabs for appearance theme presets, dark/light mode toggles, preset/custom wallpaper selections, keyboard sound click selectors (with list-based muting), and notification settings.
 * **Dynamic Backdrop Wallpapers**: Dynamic folder scanning using Vite's `import.meta.glob`. Drop any image into the `frontend/src/assets/wallpapers/` folder and it will automatically be detected and rendered as a choice in the UI.
-* **Accent Theme Customization**: Custom accent color selections synced immediately across the app using Tailwind and HeroUI theme tokens.
-* **Keyboard Keystroke Sounds**: Audio feedback on typing, customizable and toggleable directly from the chat header.
 * **Media Uploads (Images & Videos)**: Optimised file uploads via ImageKit. Files are sized, compressed, and delivered efficiently (e.g. WebP/AVIF format auto-detection and video poster frame generation).
 * **Premium UX/UI**: Implemented with glassmorphism, fluid micro-animations, slide-overs, and a responsive structure built on Tailwind CSS.
 
@@ -29,6 +28,7 @@ The project is organized into two primary workspaces under a single repository:
 │   │   ├── models/           # Mongoose Database Schemas (User, Message)
 │   │   ├── routes/           # Express Route Declarations
 │   │   ├── seeds/            # User seeding scripts for testing
+│   │   ├── scripts/          # Cleanup and localtunnel helper scripts
 │   │   ├── webhooks/         # Clerk User sync webhook router
 │   │   └── server.js         # Express main application setup
 │   └── package.json
@@ -37,6 +37,8 @@ The project is organized into two primary workspaces under a single repository:
 │   ├── src/
 │   │   ├── assets/           # Wallpapers, logo assets
 │   │   ├── components/       # Reusable React UI Components (Auth, Chat)
+│   │   │   ├── settings/     # Modular settings tabs (Theme, Backdrop, Sounds)
+│   │   │   └── SettingsModal.jsx # Root settings dialog trigger component
 │   │   ├── context/          # Theme & Wallpaper Context providers
 │   │   ├── data/             # Scanned wallpaper arrays and theme presets
 │   │   ├── hooks/            # Keyboard sounds, media queries, and scrolling hooks
@@ -93,6 +95,30 @@ Start the frontend Vite server:
 cd frontend
 npm install
 npm run dev
+```
+
+---
+
+## 🎛️ Utility & Administrative Scripts
+
+Several convenience scripts are provided in the `/backend` workspace to streamline development and administrative maintenance:
+
+### 1. Database & Asset Purge (`npm run db:clean`)
+Reset your MongoDB collections, Clerk user registry, and ImageKit assets simultaneously or selectively using flags:
+```bash
+# Clean everything (MongoDB database, ImageKit files, and Clerk users)
+npm run db:clean
+
+# Clean only specific targets
+npm run db:clean -- --db         # Purges MongoDB Users & Messages collections
+npm run db:clean -- --imagekit   # Purges all uploaded files from ImageKit
+npm run db:clean -- --clerk      # Deletes all user accounts from Clerk API
+```
+
+### 2. Local Port Tunneling (`npm run tunnel`)
+Expose your local backend server to the internet using `localtunnel` so that you can receive and test Clerk's webhook callbacks in real-time on localhost:
+```bash
+npm run tunnel
 ```
 
 ---

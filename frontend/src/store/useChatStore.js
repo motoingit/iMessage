@@ -67,12 +67,18 @@ export const useChatStore = create(
         try {
           const res = await axiosInstance.get(`/messages/${userId}`);
           console.log("[useChatStore] Messages loaded successfully:", res.data.length, "messages");
-          set({ messages: res.data });
+          
+          // Only update state if this user is still the active conversation partner (avoids race condition)
+          if (get().activeConversationId === userId) {
+            set({ messages: res.data });
+          }
         } catch (error) {
           console.error("[useChatStore] Error in getMessages:", error);
           toast.error(error.response?.data?.message || "Failed to load messages");
         } finally {
-          set({ isMessagesLoading: false });
+          if (get().activeConversationId === userId) {
+            set({ isMessagesLoading: false });
+          }
         }
       },
 
@@ -155,13 +161,18 @@ export const useChatStore = create(
 
       setActiveConversationId: (activeConversationId) => {
         console.log("[useChatStore] Setting active conversation ID:", activeConversationId);
+        
+        // Clear messages if switching to a different conversation to avoid showing stale messages
+        const currentActiveId = get().activeConversationId;
+        const messages = activeConversationId === currentActiveId ? get().messages : [];
+
         set((state) => ({
           activeConversationId,
           selectedUser:
             state.users.find((user) => user._id === activeConversationId) ||
             state.conversations.find((user) => user._id === activeConversationId) ||
             null,
-          messages: activeConversationId ? state.messages : [],
+          messages,
         }));
       },
 

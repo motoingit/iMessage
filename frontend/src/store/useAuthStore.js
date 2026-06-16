@@ -40,10 +40,21 @@ export const useAuthStore = create((set, get) => ({
   },
 
   connectSocket: (user)=>{
-    if(!user || get().socket?.connected) return;
+    if(!user) return;
+
+    const existingSocket = get().socket;
+    if (existingSocket?.connected) return;
+
+    if (existingSocket) {
+      console.log("[useAuthStore] Cleaning up existing disconnected socket instance.");
+      existingSocket.disconnect();
+    }
 
     console.log("[useAuthStore] Connecting socket with BASE_URL:", BASE_URL, "for user:", user._id);
-    const socket = io(BASE_URL, {query:{userId: user._id}})
+    const socket = io(BASE_URL, {
+      query: { userId: user._id },
+      transports: ["websocket"],
+    });
     set({socket})
 
     socket.on("connect", () => {
