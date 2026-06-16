@@ -1,7 +1,13 @@
+// more info
+// https://clerk.com/docs/guides/development/webhooks/overview#payload-structure
+// https://clerk.com/docs/reference/backend/verify-webhook
+// https://clerk.com/docs/guides/development/webhooks/syncing
+
 import express from "express";
 import { verifyWebhook } from "@clerk/express/webhooks";
 
 import User from "../models/user.model.js";
+
 
 const router = express.Router();
 
@@ -10,12 +16,12 @@ router.post("/", async (req, res) => {
 
   const signingSecret = process.env.CLERK_WEBHOOK_SIGNIN_KEY;
 
-  console.log("🔥 [2] Secret exists:", !!signingSecret);
+  console.log("🔥 [2] Secret exists (you hide key):", !!signingSecret);
 
   if (!signingSecret) {
     console.log("❌ [3] Missing webhook secret");
     return res.status(503).json({
-      message: "Webhook secret is not provided",
+      message: "Webhook secret key is missing",
     });
   }
 

@@ -1,5 +1,6 @@
 #* env
 .env
+.env.render
 /.notes
 
 node_modules

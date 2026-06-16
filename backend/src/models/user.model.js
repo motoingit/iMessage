@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 const userSchema = new mongoose.Schema(
+  //! dont put commnet on schemma
+  // _id auto genrated
   {
-    // _id auto genrated
     clerkId:{
       type:String,
       required: true,

@@ -1,4 +1,5 @@
 import './App.css'
+
 import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
         </Show>
 
         <Show when="signed-in">
-          <UserButton />
+          <UserButton mode='modal'/>
         </Show>
       </header>
     </>
