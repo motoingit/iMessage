@@ -110,7 +110,7 @@ router.post("/", async (req, res) => {
         });
 
         if(deletedData === null){
-          console.log("❌ [14.5] Querry to delete in not found in database");
+          console.log("❌ [14.5] Query to delete is not found in database");
           return res.status(503).json({
             message: "Delete user details are not found to delete, no action done",
           });

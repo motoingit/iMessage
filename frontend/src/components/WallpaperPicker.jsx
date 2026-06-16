@@ -3,12 +3,13 @@ import { Check, ImageIcon } from "lucide-react";
 import { useTransition } from "react";
 import { useWallpaper } from "../context/wallpaper";
 import { WALLPAPER_SECTIONS, WALLPAPERS } from "../data/wallpapers";
+import toast from "react-hot-toast";
 
 function WallpaperThumb({ wallpaper, selected, onSelect }) {
   return (
     <button
       type="button"
-      onClick={() => onSelect(wallpaper.id)}
+      onClick={() => onSelect(wallpaper.id, wallpaper.label)}
       className={[
         "relative aspect-4/3 w-full overflow-hidden rounded-xl bg-zinc-900 contain-[layout]",
         selected
@@ -48,10 +49,11 @@ export function WallpaperPicker() {
   const { wallpaperId, setWallpaperId } = useWallpaper();
   const [, startTransition] = useTransition();
 
-  const handleSelect = (id) => {
+  const handleSelect = (id, label) => {
     modal.close();
     startTransition(() => {
       setWallpaperId(id);
+      toast.success(`Wallpaper changed to: ${label}`);
     });
   };
 

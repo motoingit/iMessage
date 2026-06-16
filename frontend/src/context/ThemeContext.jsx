@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { DEFAULT_THEME_PRESET_ID } from "../data/herouiThemePresets";
 import { applyThemePresetToDocument, isValidThemePreset, ThemeContext } from "./theme";
+import toast from "react-hot-toast";
 
 function getSystemTheme() {
   if (typeof window === "undefined") return "light";
@@ -47,10 +48,17 @@ export function ThemeProvider({ children }) {
     localStorage.setItem("theme-preset", themePreset);
   }, [theme, themePreset]);
 
-  const setTheme = (next) => setThemeState(next);
+  const setTheme = (next) => {
+    setThemeState(next);
+    toast.success(`Theme mode set to ${next}`);
+  };
 
   const toggleTheme = () => {
-    setThemeState((t) => (t === "dark" ? "light" : "dark"));
+    setThemeState((t) => {
+      const nextTheme = t === "dark" ? "light" : "dark";
+      toast.success(`Theme mode switched to ${nextTheme}`);
+      return nextTheme;
+    });
   };
 
   const setThemePreset = (next) => {

@@ -2,14 +2,16 @@ import { Button, Modal, useOverlayState } from "@heroui/react";
 import { Check, Palette } from "lucide-react";
 import { applyThemePresetToDocument, useTheme } from "../context/theme";
 import { HERO_UI_THEME_PRESETS } from "../data/herouiThemePresets";
+import toast from "react-hot-toast";
 
 export function ThemePresetPicker() {
   const modal = useOverlayState();
   const { themePreset, setThemePreset } = useTheme();
 
-  const handleSelect = (id) => {
+  const handleSelect = (id, label) => {
     applyThemePresetToDocument(id);
     setThemePreset(id);
+    toast.success(`Accent theme changed to: ${label}`);
     modal.close();
   };
 
@@ -42,7 +44,7 @@ export function ThemePresetPicker() {
                     <button
                       key={p.id}
                       type="button"
-                      onClick={() => handleSelect(p.id)}
+                      onClick={() => handleSelect(p.id, p.label)}
                       className={[
                         "relative flex flex-col items-center gap-2 rounded-xl p-2 text-center transition-colors",
                         selected

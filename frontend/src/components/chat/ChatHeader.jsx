@@ -10,6 +10,7 @@ import { WallpaperPicker } from "../WallpaperPicker";
 
 import { useChatStore } from "../../store/useChatStore";
 import { useSelectedConversation } from "../../hooks/useSelectedConversation";
+import toast from "react-hot-toast";
 
 export function ChatHeader() {
   const isSoundEnabled = useChatStore((state) => state.isSoundEnabled);
@@ -82,7 +83,11 @@ export function ChatHeader() {
           isIconOnly
           className="shrink-0"
           aria-pressed={isSoundEnabled}
-          onPress={() => setSoundEnabled(!isSoundEnabled)}
+          onPress={() => {
+            const nextSoundState = !isSoundEnabled;
+            setSoundEnabled(nextSoundState);
+            toast.success(nextSoundState ? "Keystroke sounds enabled" : "Keystroke sounds muted");
+          }}
         >
           {isSoundEnabled ? (
             <Volume2Icon className="size-5.5" strokeWidth={2} aria-hidden />

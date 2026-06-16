@@ -12,7 +12,7 @@ export async function connectDatabase() {
     }
 
     const connection = await mongoose.connect(databaseURI);
-    console.log("Database Connection is Sucessfull : CODE", connection.connection.host);
+    console.log("Database Connection is Successful : CODE", connection.connection.host);
     
   } catch(error){
     console.error(error);

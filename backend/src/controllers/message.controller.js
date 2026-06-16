@@ -11,7 +11,7 @@ export async function getUserForSidebar(req, res) {
     res.status(200).json(filteredUsers);
 
   }catch(error){
-    console.error("Error in getUsersForSidebar:", error.message);
+    console.error("[MessageController] Error in getUsersForSidebar:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -47,7 +47,7 @@ export async function getConversationsForSidebar(req, res) {
 
     res.status(200).json(conversations);
   }catch(error){
-    console.error("Error in getConversationsForSidebar:", error.message);
+    console.error("[MessageController] Error in getConversationsForSidebar:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -68,7 +68,7 @@ export async function getMessages(req, res) {
 
     res.status(200).json(messages);
   } catch (error) {
-    console.error("Error in getMessages:", error.message);
+    console.error("[MessageController] Error in getMessages:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -114,7 +114,7 @@ export async function sendMessages(req, res) {
     res.status(201).json(newMessage);
 
   } catch (error) {
-    console.error("Error in getMessages:", error.message);
+    console.error("[MessageController] Error in sendMessages:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
