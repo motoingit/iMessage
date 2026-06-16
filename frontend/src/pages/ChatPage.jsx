@@ -6,6 +6,8 @@ import ChatSidebar from "../components/chat/ChatSidebar";
 import { ChatHeader } from "../components/chat/ChatHeader";
 import { MessageList } from "../components/chat/MessageList";
 import { ChatComposer } from "../components/chat/ChatComposer";
+import { useAuthStore } from "../store/useAuthStore";
+import { getSoundsByCategory } from "../data/sounds";
 
 
 function ChatPage() {
@@ -23,6 +25,30 @@ function ChatPage() {
     getUsers();
     getConversations();
   }, [getConversations, getUsers]);
+
+  const authUser = useAuthStore((state) => state.authUser);
+
+  useEffect(() => {
+    if (authUser?.selectedBackMusicSoundId) {
+      const backMusicSounds = getSoundsByCategory("back-music", authUser.customSounds);
+      const activeTrack = backMusicSounds.find((s) => s.id === authUser.selectedBackMusicSoundId);
+      if (activeTrack?.url) {
+        if (window._activeAmbientMusic) {
+          window._activeAmbientMusic.pause();
+        }
+        const music = new Audio(activeTrack.url);
+        music.loop = true;
+        music.volume = 0.20;
+        music.play().catch((err) => console.log("Ambient music autoplay failed or blocked:", err));
+        window._activeAmbientMusic = music;
+      }
+    } else {
+      if (window._activeAmbientMusic) {
+        window._activeAmbientMusic.pause();
+        window._activeAmbientMusic = null;
+      }
+    }
+  }, [authUser?.selectedBackMusicSoundId, authUser?.customSounds]);
 
   useEffect(() => {
     if (!activeConversationId) return;

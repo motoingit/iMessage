@@ -11,6 +11,7 @@ import {clerkMiddleware} from '@clerk/express'
 import clerkWebhook from './webhooks/clerk.webhook.js';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+import userRoutes from './routes/user.route.js';
 import User from "./models/user.model.js";
 import {app, server, io, getReceiverSocketId} from "./lib/socket.js";
 
@@ -50,6 +51,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/user", userRoutes);
 
 // app.get("/", (req, res) => {
 //   res.send("Backend is Running");

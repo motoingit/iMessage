@@ -7,6 +7,7 @@ import { ThemePresetPicker } from "../ThemePresetPicker";
 
 import { ThemeToggle } from "../ThemeToggle";
 import { WallpaperPicker } from "../WallpaperPicker";
+import { SoundSettingsPicker } from "../SoundSettingsPicker";
 
 import { useChatStore } from "../../store/useChatStore";
 import { useSelectedConversation } from "../../hooks/useSelectedConversation";
@@ -73,6 +74,7 @@ export function ChatHeader() {
         <div className="hidden min-[400px]:contents">
           <WallpaperPicker />
           <ThemePresetPicker />
+          <SoundSettingsPicker />
         </div>
 
         <ThemeToggle />

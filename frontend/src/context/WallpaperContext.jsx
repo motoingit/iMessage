@@ -1,33 +1,39 @@
-import { useEffect, useState } from "react";
-import { frameStyleFromUrl, getWallpaperById } from "../data/wallpapers";
+import { frameStyleFromUrl, getWallpaperById, WALLPAPERS } from "../data/wallpapers";
 import { WallpaperContext } from "./wallpaper";
-
-const STORAGE_KEY = "chat-wallpaper-id";
-
-function readStoredWallpaperId() {
-  const wallpaperId = localStorage.getItem(STORAGE_KEY);
-  if (wallpaperId) return wallpaperId;
-
-  return "sonoma-horizon";
-}
+import { useAuthStore } from "../store/useAuthStore";
 
 export function WallpaperProvider({ children }) {
-  const [wallpaperId, setWallpaperIdState] = useState(readStoredWallpaperId);
+  const authUser = useAuthStore((state) => state.authUser);
+  const updateUserSettings = useAuthStore((state) => state.updateUserSettings);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, wallpaperId);
-  }, [wallpaperId]);
+  // Combine static compile-time wallpapers with the user's custom-uploaded wallpapers
+  const customWallpapers = authUser?.customWallpapers || [];
+  const allWallpapers = [...WALLPAPERS, ...customWallpapers];
 
-  const wallpaper = getWallpaperById(wallpaperId);
+  // Resolve wallpaper selection: MongoDB profile -> localStorage fallback -> first available image
+  const resolvedWallpaperId =
+    authUser?.selectedWallpaperId ||
+    localStorage.getItem("chat-wallpaper-id") ||
+    (allWallpapers[0]?.id || "sonoma-horizon");
 
-  const setWallpaperId = (id) => {
-    setWallpaperIdState(id);
+  const wallpaper = allWallpapers.find((w) => w.id === resolvedWallpaperId) || allWallpapers[0] || {
+    id: "sonoma-horizon",
+    category: "desktop",
+    label: "Sonoma Horizon",
+    url: "",
+  };
+
+  const setWallpaperId = async (id) => {
+    localStorage.setItem("chat-wallpaper-id", id);
+    if (authUser) {
+      await updateUserSettings({ selectedWallpaperId: id });
+    }
   };
 
   const frameStyle = frameStyleFromUrl(wallpaper.url);
 
   return (
-    <WallpaperContext.Provider value={{ wallpaperId, setWallpaperId, wallpaper, frameStyle }}>
+    <WallpaperContext.Provider value={{ wallpaperId: resolvedWallpaperId, setWallpaperId, wallpaper, frameStyle, allWallpapers }}>
       {children}
     </WallpaperContext.Provider>
   );

@@ -8,7 +8,9 @@
     "dev2": "node src/server.js",
     "build": "rm -rf dist && cp -R src dist",
     "start": "node dist/server.js",
-    "db:seed": "node src/seeds/user.seed.js"
+    "db:seed": "node src/seeds/user.seed.js",
+    "db:clean": "node src/scripts/clean-all.js",
+    "tunnel": "node src/scripts/tunnel.js"
   },
   "keywords": [],
   "author": "Mohit Singh",

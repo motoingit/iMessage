@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { DEFAULT_THEME_PRESET_ID } from "../data/herouiThemePresets";
 import { applyThemePresetToDocument, isValidThemePreset, ThemeContext } from "./theme";
+import { useAuthStore } from "../store/useAuthStore";
 import toast from "react-hot-toast";
 
 function getSystemTheme() {
@@ -29,8 +30,13 @@ function readStoredThemePreset() {
 }
 
 export function ThemeProvider({ children }) {
+  const authUser = useAuthStore((state) => state.authUser);
+  const updateUserSettings = useAuthStore((state) => state.updateUserSettings);
+
   const [theme, setThemeState] = useState(() => readStoredTheme() ?? getSystemTheme());
   const [themePreset, setThemePresetState] = useState(readStoredThemePreset);
+
+  const resolvedPreset = authUser?.selectedThemePreset || themePreset;
 
   // this applies light/dark mode
   useLayoutEffect(() => {
@@ -39,14 +45,14 @@ export function ThemeProvider({ children }) {
 
   // this applies the theme preset, like sky, spotify, etc.
   useLayoutEffect(() => {
-    applyThemePresetToDocument(themePreset);
-  }, [themePreset]);
+    applyThemePresetToDocument(resolvedPreset);
+  }, [resolvedPreset]);
 
   // this stores the theme and theme preset in local storage
   useEffect(() => {
     localStorage.setItem("theme", theme);
-    localStorage.setItem("theme-preset", themePreset);
-  }, [theme, themePreset]);
+    localStorage.setItem("theme-preset", resolvedPreset);
+  }, [theme, resolvedPreset]);
 
   const setTheme = (next) => {
     setThemeState(next);
@@ -61,14 +67,16 @@ export function ThemeProvider({ children }) {
     });
   };
 
-  const setThemePreset = (next) => {
-    setThemePresetState((prev) => {
-      const resolved = typeof next === "function" ? next(prev) : next;
-      return isValidThemePreset(resolved) ? resolved : DEFAULT_THEME_PRESET_ID;
-    });
+  const setThemePreset = async (next) => {
+    const resolved = typeof next === "function" ? next(resolvedPreset) : next;
+    const nextPreset = isValidThemePreset(resolved) ? resolved : DEFAULT_THEME_PRESET_ID;
+    setThemePresetState(nextPreset);
+    if (authUser) {
+      await updateUserSettings({ selectedThemePreset: nextPreset });
+    }
   };
 
-  const value = { theme, setTheme, toggleTheme, themePreset, setThemePreset };
+  const value = { theme, setTheme, toggleTheme, themePreset: resolvedPreset, setThemePreset };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

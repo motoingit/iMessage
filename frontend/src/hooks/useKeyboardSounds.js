@@ -1,17 +1,22 @@
-// audio setup
-const keyStrokeSounds = [
-  new Audio("/sounds/keystroke1.mp3"),
-  // new Audio("/sounds/keystroke2.mp3"),
-  // new Audio("/sounds/keystroke3.mp3"),
-  // new Audio("/sounds/keystroke4.mp3"),
-];
+import { useAuthStore } from "../store/useAuthStore";
+import { getSoundsByCategory } from "../data/sounds";
 
 function useKeyboardSounds() {
-  const playRandomKeyStrokeSound = () => {
-    const randomSound = keyStrokeSounds[Math.floor(Math.random() * keyStrokeSounds.length)];
+  const authUser = useAuthStore((state) => state.authUser);
 
-    randomSound.currentTime = 0; // this is for a better UX, def add this
-    randomSound.play().catch((error) => console.log("Audio play failed:", error));
+  const playRandomKeyStrokeSound = () => {
+    const keystrokeSounds = getSoundsByCategory("keystroke", authUser?.customSounds);
+    if (keystrokeSounds.length === 0) return;
+
+    // Resolve active selection: database settings -> fallback to the first sound in the list
+    const selectedId = authUser?.selectedKeystrokeSoundId;
+    const soundObj = keystrokeSounds.find((s) => s.id === selectedId) || keystrokeSounds[0];
+
+    if (!soundObj || !soundObj.url) return;
+
+    const audio = new Audio(soundObj.url);
+    audio.currentTime = 0;
+    audio.play().catch((error) => console.log("[useKeyboardSounds] Audio play failed:", error));
   };
 
   return { playRandomKeyStrokeSound };

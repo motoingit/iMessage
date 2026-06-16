@@ -29,4 +29,31 @@ async function uploadChatMedia(file) {
   return result.url;
 }
 
-export { uploadChatMedia, hasImageKitConfig };
+async function uploadGenericMedia(file, folder = "/general") {
+  const imagekit = new ImageKit({
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  });
+
+  const fileName = createFileName(file.originalname);
+
+  const result = await imagekit.files.upload({
+    file: await toFile(file.buffer, fileName, { type: file.mimetype }),
+    fileName,
+    folder,
+  });
+
+  return {
+    url: result.url,
+    fileId: result.fileId,
+  };
+}
+
+async function deleteImageKitMedia(fileId) {
+  const imagekit = new ImageKit({
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  });
+
+  await imagekit.files.delete(fileId);
+}
+
+export { uploadChatMedia, uploadGenericMedia, deleteImageKitMedia, hasImageKitConfig };

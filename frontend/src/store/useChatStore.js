@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
+import { getSoundsByCategory } from "../data/sounds";
 import toast from "react-hot-toast";
 
 //todo: persist
@@ -113,6 +114,21 @@ export const useChatStore = create(
           }
 
           set({ messages: [...get().messages, newMessage] });
+
+          // If sound is enabled, play the user's selected notification sound
+          const isSoundEnabled = get().isSoundEnabled;
+          if (isSoundEnabled) {
+            const authUser = useAuthStore.getState().authUser;
+            const notifySounds = getSoundsByCategory("notify", authUser?.customSounds);
+            if (notifySounds.length > 0) {
+              const selectedId = authUser?.selectedNotifySoundId;
+              const soundObj = notifySounds.find((s) => s.id === selectedId) || notifySounds[0];
+              if (soundObj?.url) {
+                const audio = new Audio(soundObj.url);
+                audio.play().catch((err) => console.log("[useChatStore] Failed to play notify sound:", err));
+              }
+            }
+          }
 
           get().getConversations();
         });
