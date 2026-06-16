@@ -18,6 +18,7 @@ import {app, server, io, getReceiverSocketId} from "./lib/socket.js";
 //? ENV Extraction
 const PORT = process.env.PORT || 3001;
 const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"];
+
 const publicDir = path.join(process.cwd(),"public")
 
 // use

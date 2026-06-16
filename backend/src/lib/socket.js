@@ -7,7 +7,9 @@ import {Server} from 'socket.io';
 const app = express();
 const server = http.createServer(app);
 
-const io = new Server(server, { cors: { origin: [ allowedOrigin ] } } );
+const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"];
+
+const io = new Server(server, { cors: { origin: [ allowedOrigins ] } } );
 
 //getrecivershocet
 function getReceiverSocketId(userId){
