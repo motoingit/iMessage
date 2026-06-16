@@ -12,6 +12,7 @@ import clerkWebhook from './webhooks/clerk.webhook.js';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import User from "./models/user.model.js";
+import {app, server, io, getReceiverSocketId} from "./lib/socket.js";
 
                           //* BEGINS
 //? ENV Extraction
@@ -19,13 +20,14 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"];
 const publicDir = path.join(process.cwd(),"public")
 
-//app config
-const app = express();
-
 // use
 
-//*its impo that you dont parse the webhook event data
-app.use("/api/webhooks/clerk", express.raw({ type: "application/json" }), clerkWebhook)
+//* its important that you don't parse the webhook event data
+app.use(
+  "/api/webhooks/clerk",
+  express.raw({ type: "application/json" }),
+  clerkWebhook
+);
 
 app.use(express.json()) //* app.use for middleware
 
@@ -67,11 +69,10 @@ async function startServer() {
 
   await connectDatabase();
 
-  const server = await app.listen(PORT, "0.0.0.0", ()=>{
+  const serverData = await server.listen(PORT, "0.0.0.0", ()=>{
     console.log(`server is running on http://localhost:${PORT}`);
+    console.log("Address : ", serverData.address());
   })
-
-  console.log("Address : ", server.address());
 
 }
 

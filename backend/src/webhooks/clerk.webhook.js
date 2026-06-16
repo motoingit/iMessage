@@ -33,6 +33,7 @@ router.post("/", async (req, res) => {
     console.log("🔥 [5] Webhook verified");
     console.log("🔥 [6] Event type:", evt.type);
 
+    //update or create
     if (evt.type === "user.created" || evt.type === "user.updated") {
       console.log("🔥 [7] Processing user create/update");
 
@@ -40,11 +41,12 @@ router.post("/", async (req, res) => {
 
       console.log("🔥 [8] Clerk user id:", clerkUser.id);
 
+      const { email_addresses, primary_email_address_id } = clerkUser;
       const email =
-        clerkUser.email_addresses?.find(
-          (entry) => entry.id === clerkUser.primary_email_address_id
-        )?.email_address ??
-        clerkUser.email_addresses?.[0]?.email_address;
+        email_addresses?.find(
+          email => email.id === primary_email_address_id
+        )?.email_address ||
+        email_addresses?.[0]?.email_address;
 
       const fullName =
         [clerkUser.first_name, clerkUser.last_name]
@@ -62,16 +64,26 @@ router.post("/", async (req, res) => {
       if (email && fullName) {
         console.log("🔥 [10] About to save to MongoDB");
 
+        /*
+          findOneAndUpdate(
+            WHAT_TO_FIND,
+            WHAT_TO_SAVE,
+            HOW_TO_DO_IT
+          )
+         */
         const result = await User.findOneAndUpdate(
-          { clerkId: clerkUser.id },
-          {
+
+          { clerkId: clerkUser.id }, // 1️⃣ Query
+
+          {                        // 2️⃣ Data
             clerkId: clerkUser.id,
             email,
             fullName,
             profilePic: clerkUser.image_url ?? "",
           },
-          {
-            new: true,
+
+          {                     // 3️⃣ Options
+            returnDocument: "after",
             upsert: true,
             setDefaultsOnInsert: true,
             runValidators: true,
@@ -85,21 +97,27 @@ router.post("/", async (req, res) => {
       }
     }
 
+    //delete
     if (evt.type === "user.deleted") {
       console.log("🔥 [13] Processing user delete");
 
       if (evt.data.id) {
         console.log("🔥 [14] Deleting user:", evt.data.id);
 
-        await User.findOneAndDelete({
+        //returns null or prev data
+        const deletedData = await User.findOneAndDelete({
           clerkId: evt.data.id,
         });
 
-        console.log("🔥 [15] User deleted");
+        if(deletedData === null){
+          console.log("❌ [14.5] Querry to delete in not found in database");
+          return res.status(503).json({
+            message: "Delete user details are not found to delete, no action done",
+          });
+        }
+        console.log("🔥 [15] User deleted", deletedData);
       }
     }
-
-    console.log("🔥 [16] Sending success response");
 
     res.status(200).json({
       received: true,
@@ -113,7 +131,7 @@ router.post("/", async (req, res) => {
     console.error("❌ WEBHOOK ERROR END");
 
     res.status(400).json({
-      message: "Webhook verification failed",
+      message: "Webhook Failed Somewhere, Check logs for Details Trace",
       error: error?.message,
     });
   }

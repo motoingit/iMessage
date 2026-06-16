@@ -1,4 +1,4 @@
-async function checkAuth(req, res, next) {
+async function checkAuth(req, res) {
   if(!req.user){
     return res.status(401).json({message: "Unauthorized"});
   }

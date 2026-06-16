@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "This is the Backend",
   "main": "src/server.js",
-
   "scripts": {
     "dev": "nodemon src/server.js",
     "dev2": "node src/server.js",
@@ -11,12 +10,10 @@
     "start": "node dist/server.js",
     "db:seed": "node src/seeds/user.seed.js"
   },
-
   "keywords": [],
   "author": "Mohit Singh",
   "license": "ISC",
   "type": "module",
-
   "dependencies": {
     "@clerk/express": "^2.1.26",
     "@imagekit/nodejs": "^7.7.0",
@@ -24,9 +21,9 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.7.0",
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "socket.io": "^4.8.3"
   },
-
   "devDependencies": {
     "nodemon": "^3.1.14"
   }
