@@ -7,9 +7,9 @@ import {Server} from 'socket.io';
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"];
+const allowedOrigins = [process.env.FRONTEND_URL, /^http:\/\/localhost:\d+$/];
 
-const io = new Server(server, { cors: { origin: [ allowedOrigins ] } } );
+const io = new Server(server, { cors: { origin: allowedOrigins } });
 
 //getrecivershocet
 function getReceiverSocketId(userId){
@@ -28,7 +28,7 @@ io.on("connection", (socket)=>{
   // io.emit() sends event to everyone - broadcast
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  socket.on("dissconnect", ()=>{
+  socket.on("disconnect", ()=>{
     if(userId) delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   })
