@@ -50,15 +50,18 @@ function ChatPage() {
     }
   }, [authUser?.selectedBackMusicSoundId, authUser?.customSounds]);
 
+  // Fetch messages when selected conversation changes
   useEffect(() => {
-    if (!activeConversationId) return;
+    if (activeConversationId) {
+      getMessages(activeConversationId);
+    }
+  }, [activeConversationId, getMessages]);
 
-    getMessages(activeConversationId);
+  // Subscribe to socket events globally on mount/active conversation changes
+  useEffect(() => {
     subscribeToMessages(activeConversationId);
-
-    // cleanup - imporove performance
     return () => unsubscribeFromMessages();
-  }, [getMessages, activeConversationId, subscribeToMessages, unsubscribeFromMessages]);
+  }, [activeConversationId, subscribeToMessages, unsubscribeFromMessages]);
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden p-2 sm:p-3 md:p-8" style={frameStyle}>

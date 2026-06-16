@@ -94,31 +94,38 @@ export const useChatStore = create(
         }
       },
 
-      subscribeToMessages: (userId) => {
-        if (!userId) return;
-
+      subscribeToMessages: (activePartnerId) => {
         const socket = useAuthStore.getState().socket;
         if (!socket) {
           console.warn("[useChatStore] Socket is not connected, cannot subscribe to messages");
           return;
         }
 
-        console.log("[useChatStore] Subscribing to newMessage events for partner:", userId);
+        console.log("[useChatStore] Subscribing to newMessage events. Active partner:", activePartnerId);
         socket.off("newMessage");
         socket.on("newMessage", (newMessage) => {
           console.log("[useChatStore] Received real-time newMessage event:", newMessage);
-          // if im not the receiver don't do anything just return
-          if (String(newMessage.senderId) !== String(userId)) {
-            console.log("[useChatStore] Message ignored (not from active conversational partner):", newMessage.senderId);
-            return;
+
+          // 1. Prevent duplicate message additions
+          const currentMessages = get().messages;
+          const isDuplicate = currentMessages.some((m) => m._id === newMessage._id);
+
+          // 2. Append to messages if it belongs to the active conversation
+          if (activePartnerId) {
+            const isFromPartner = String(newMessage.senderId) === String(activePartnerId);
+            const isToPartner = String(newMessage.receiverId) === String(activePartnerId);
+
+            if ((isFromPartner || isToPartner) && !isDuplicate) {
+              set({ messages: [...currentMessages, newMessage] });
+            }
           }
 
-          set({ messages: [...get().messages, newMessage] });
-
-          // If sound is enabled, play the user's selected notification sound
+          // 3. Play notify sound if it's an incoming message (not sent by us) and sound is enabled
+          const authUser = useAuthStore.getState().authUser;
+          const isIncoming = authUser && String(newMessage.senderId) !== String(authUser._id);
           const isSoundEnabled = get().isSoundEnabled;
-          if (isSoundEnabled) {
-            const authUser = useAuthStore.getState().authUser;
+
+          if (isIncoming && isSoundEnabled) {
             const notifySounds = getSoundsByCategory("notify", authUser?.customSounds);
             if (notifySounds.length > 0) {
               const selectedId = authUser?.selectedNotifySoundId;
@@ -130,6 +137,7 @@ export const useChatStore = create(
             }
           }
 
+          // 4. Refresh sidebar conversations list for sorting and last message updates
           get().getConversations();
         });
       },

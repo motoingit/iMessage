@@ -104,11 +104,21 @@ export async function sendMessages(req, res) {
     await newMessage.save();
 
     //todo: realtime - we dont want to sender to relaod | ++++++ socketIO
-    const receiverSocketId = getReceiverSocketId(receiverId);
+    const receiverSocketIds = getReceiverSocketId(receiverId);
 
-    //only ssend message if user is online
-    if(receiverSocketId){
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+    //only send message if user is online
+    if(receiverSocketIds && receiverSocketIds.length > 0){
+      receiverSocketIds.forEach(socketId => {
+        io.to(socketId).emit("newMessage", newMessage);
+      });
+    }
+
+    // Also emit to the sender's own active sockets (for multi-tab/device sync)
+    const senderSocketIds = getReceiverSocketId(senderId);
+    if(senderSocketIds && senderSocketIds.length > 0){
+      senderSocketIds.forEach(socketId => {
+        io.to(socketId).emit("newMessage", newMessage);
+      });
     }
 
     res.status(201).json(newMessage);
