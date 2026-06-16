@@ -5,10 +5,10 @@ export const WALLPAPER_SECTIONS = [
 
 export const WALLPAPERS = [
   {
-    id: "sonoma-horizon",
+    id: "iceland-coast",
     category: "desktop",
-    label: "Sonoma Horizon",
-    url: "/wallpapers/sonoma-horizon.jpg",
+    label: "Iceland Coast",
+    url: "/wallpapers/iceland-coast.jpg",
   },
   {
     id: "redwoods",
@@ -29,10 +29,10 @@ export const WALLPAPERS = [
     url: "/wallpapers/san-francisco-bay.jpg",
   },
   {
-    id: "iceland-coast",
+    id: "sonoma-horizon",
     category: "desktop",
-    label: "Iceland Coast",
-    url: "/wallpapers/iceland-coast.jpg",
+    label: "Sonoma Horizon",
+    url: "/wallpapers/sonoma-horizon.jpg",
   },
   {
     id: "new-york-midtown",
